@@ -11,6 +11,7 @@ DRYRUN=0
 UPDATE=0
 REQUIRED_RECOMMENDED_ALL=1
 SUDO=""
+AUTO_YES=0
 
 PKGS_UPDATE=""
 PKGS_REQUIRED=()
@@ -38,6 +39,10 @@ while (( "$#" )); do
       UPDATE=1
       shift
       ;;
+    -y|--auto-interactive-yes)
+      AUTO_YES=1
+      shift
+      ;;
     -m|--package-manager)
       if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
         MANAGERS=($2)
@@ -54,6 +59,7 @@ while (( "$#" )); do
       echo "  -d, --dry-run:             print actions, but do not execute"
       echo "  -l, --list:                just list the packages to install"
       echo "  -u, --update-package-list: update package manager package list"
+      echo "  -y, --auto-interactive-yes: automatically answer yes when asking user confirmation"
       echo "  -h, --help:                this help message"
       echo " (required|recommended|all) the set of dependencies to select."
       exit 0
@@ -116,6 +122,7 @@ if [[ "$MANAGER" == "apt-get" ]]; then
     PKGS_UPDATE="apt-get update"
     PKGS_OPTIONS+=(install --no-install-suggests --no-install-recommends)
     if ((DRYRUN > 0));  then PKGS_OPTIONS+=(--dry-run); fi
+    if ((AUTO_YES > 0));  then PKGS_OPTIONS+=(-y); fi
     PKGS_REQUIRED+=(libgl1-mesa-dev libwayland-dev libxkbcommon-dev wayland-protocols libegl1-mesa-dev)
     PKGS_REQUIRED+=(libc++-dev libglew-dev libeigen3-dev cmake)
     PKGS_RECOMMENDED+=(libjpeg-dev libpng-dev)
